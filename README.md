@@ -1,93 +1,163 @@
-# blowball-backend
+# SpringBoot 项目初始模板
+
+> 作者：[StephenQiu](https://stephenqhd30.github.io/)
+> 仅分享于 [StephenQiu个人博客](https://stephenqhd30.github.io/)
+
+基于 Java SpringBoot 的项目初始模板，整合了常用框架和主流业务的示例代码。
+
+只需 1 分钟即可完成内容网站的后端！！！大家还可以在此基础上快速开发自己的项目。
+
+[toc]
+
+## 模板特点
+
+### 主流框架 & 特性
+
+- Spring Boot 2.7.x
+- Spring MVC
+- MyBatis + MyBatis Plus 数据访问（开启分页）
+- Spring Boot 调试工具和项目处理器
+- Spring AOP 切面编程
+- Spring Scheduler 定时任务
+- Spring 事务注解
+
+### 数据存储
+
+- MySQL 数据库
+- Redis 内存数据库
+- Elasticsearch 搜索引擎
+- 腾讯云 COS 对象存储
+
+### 工具类
+
+- Easy Excel 表格处理
+- Hutool 工具库
+- Apache Commons Lang3 工具类
+- Lombok 注解
+
+### 业务特性
+
+- Spring Session Redis 分布式登录
+- 全局请求响应拦截器（记录日志）
+- 全局异常处理器
+- 自定义错误码
+- 封装通用响应类
+- Swagger + Knife4j 接口文档
+- 自定义权限注解 + 全局校验
+- 全局跨域处理
+- 长整数丢失精度解决
+- 多环境配置
 
 
+## 业务功能
 
-## Getting started
+- 提供示例 SQL（用户、帖子、帖子点赞、帖子收藏表）
+- 用户登录、注册、注销、更新、检索、权限管理
+- 帖子创建、删除、编辑、更新、数据库检索、ES 灵活检索
+- 帖子点赞、取消点赞
+- 帖子收藏、取消收藏、检索已收藏帖子
+- 帖子全量同步 ES、增量同步 ES 定时任务
+- 支持微信开放平台登录
+- 支持微信公众号订阅、收发消息、设置菜单
+- 支持分业务的文件上传
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+### 单元测试
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+- JUnit5 单元测试
+- 示例单元测试类
 
-## Add your files
+### 架构设计
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+- 合理分层
+
+
+## 快速上手
+
+> 所有需要修改的地方都标记了 `todo`，便于大家找到修改的位置~
+
+### MySQL 数据库
+
+1）修改 `application.yml` 的数据库配置为你自己的：
+
+```yml
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/blowball
+    username: root
+    password: 123456
+```
+
+2）执行 `sql/create_table.sql` 中的数据库语句，自动创建库表
+
+3）启动项目，访问 `http://localhost:8101/api/doc.html` 即可打开接口文档，不需要写前端就能在线调试接口了~
+
+![](doc/swagger.png)
+
+### Redis 分布式登录
+
+1）修改 `application.yml` 的 Redis 配置为你自己的：
+
+```yml
+spring:
+  redis:
+    database: 1
+    host: localhost
+    port: 6379
+    timeout: 180000
+```
+
+2）修改 `application.yml` 中的 session 存储方式：
+
+```yml
+spring:
+  session:
+    store-type: redis
+```
+
+3）移除 `MainApplication` 类开头 `@SpringBootApplication` 注解内的 exclude 参数：
+
+修改前：
+
+```java
+@SpringBootApplication(exclude = {RedisAutoConfiguration.class})
+```
+
+修改后：
+
+
+```java
+@SpringBootApplication
+```
+
+### Elasticsearch 搜索引擎
+
+1）修改 `application.yml` 的 Elasticsearch 配置为你自己的：
+
+```yml
+spring:
+  elasticsearch:
+    uris: http://localhost:9200
+    username: root
+    password: 123456
+```
+
+2）复制 `sql/post_es_mapping.json` 文件中的内容，通过调用 Elasticsearch 的接口或者 Kibana Dev Tools 来创建索引（相当于数据库建表）
 
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/popcornqhd/blowball-backend.git
-git branch -M main
-git push -uf origin main
+PUT post_v1
+{
+ 参数见 sql/post_es_mapping.json 文件
+}
 ```
 
-## Integrate with your tools
+这步不会操作的话需要补充下 Elasticsearch 的知识，或者自行百度一下~
 
-- [ ] [Set up project integrations](https://gitlab.com/popcornqhd/blowball-backend/-/settings/integrations)
+3）开启同步任务，将数据库的帖子同步到 Elasticsearch
 
-## Collaborate with your team
+找到 job 目录下的 `FullSyncPostToEs` 和 `IncSyncPostToEs` 文件，取消掉 `@Component` 注解的注释，再次执行程序即可触发同步：
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
-
-## Test and Deploy
-
-Use the built-in continuous integration in GitLab.
-
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
-
-***
-
-# Editing this README
-
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
-
-## Suggestions for a good README
-
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
-
-## Name
-Choose a self-explaining name for your project.
-
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+```java
+// todo 取消注释开启任务
+//@Component
+```
