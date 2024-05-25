@@ -1,6 +1,5 @@
 # 数据库初始化
 # @author stephen qiu
-#
 
 -- 创建库
 create database if not exists blowball;
