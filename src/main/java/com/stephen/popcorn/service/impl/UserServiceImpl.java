@@ -6,6 +6,7 @@ import static com.stephen.popcorn.constants.UserConstant.USER_LOGIN_STATE;
 import cn.hutool.core.collection.CollUtil;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.stephen.popcorn.common.ErrorCode;
 import com.stephen.popcorn.constants.CommonConstant;
@@ -300,5 +301,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 		queryWrapper.orderBy(SqlUtils.validSortField(sortField), sortOrder.equals(CommonConstant.SORT_ORDER_ASC),
 				sortField);
 		return queryWrapper;
+	}
+	
+	/**
+	 * 分页查询用户
+	 * @param userQueryRequest
+	 * @return
+	 */
+	@Override
+	public Page<UserVO> listUserVOByPage(UserQueryRequest userQueryRequest) {
+		int size = userQueryRequest.getPageSize();
+		int current = userQueryRequest.getCurrent();
+		Page<User> userPage = this.page(new Page<>(current, size),
+				this.getQueryWrapper(userQueryRequest));
+		Page<UserVO> userVOPage = new Page<>(current, size, userPage.getTotal());
+		List<UserVO> userVO = this.getUserVO(userPage.getRecords());
+		userVOPage.setRecords(userVO);
+		return userVOPage;
 	}
 }

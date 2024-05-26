@@ -49,7 +49,7 @@ public class CrawlerTest {
 			String title = element.select(".inflnk").get(0).attr("aria-label");
 			Picture picture = new Picture();
 			picture.setTitle(title);
-			picture.setUrl(url);
+			picture.setUrl(murl);
 			pictures.add(picture);
 		}
 		System.out.println(pictures);
@@ -63,7 +63,7 @@ public class CrawlerTest {
 				"  \"sortField\": \"createTime\",\n" +
 				"  \"sortOrder\": \"descend\",\n" +
 				"  \"reviewStatus\": 1,\n" +
-				"  \"current\": 1\n" +
+				"  \"current\": 2\n" +
 				"}";
 		String url = "https://api.code-nav.cn/api/post/list/page/vo";
 		String result = HttpRequest
