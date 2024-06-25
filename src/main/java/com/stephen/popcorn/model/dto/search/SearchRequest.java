@@ -22,4 +22,9 @@ public class SearchRequest extends PageRequest implements Serializable {
 	 */
 	private String searchText;
 	
+	/**
+	 * 分类
+	 */
+	private String type;
+	
 }

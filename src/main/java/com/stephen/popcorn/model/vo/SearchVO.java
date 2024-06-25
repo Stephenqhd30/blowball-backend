@@ -28,4 +28,9 @@ public class SearchVO implements Serializable {
 	 * 图片
 	 */
 	private List<Picture> pictureList;
+	
+	/**
+	 * 分页数据源对象集合
+	 */
+	private List<?> dateList;
 }
