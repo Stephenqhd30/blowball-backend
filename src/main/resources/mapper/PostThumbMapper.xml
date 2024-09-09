@@ -6,7 +6,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.stephen.popcorn.mapper.PostThumbMapper">
 
-    <resultMap id="BaseResultMap" type="com.stephen.popcorn.model.entity.PostThumb">
+    <resultMap id="BaseResultMap" type="com.stephen.blowball.model.entity.PostThumb">
             <id property="id" column="id" jdbcType="BIGINT"/>
             <result property="postId" column="postId" jdbcType="BIGINT"/>
             <result property="userId" column="userId" jdbcType="BIGINT"/>

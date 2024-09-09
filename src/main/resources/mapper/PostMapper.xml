@@ -6,7 +6,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.stephen.popcorn.mapper.PostMapper">
 
-    <resultMap id="BaseResultMap" type="com.stephen.popcorn.model.entity.Post">
+    <resultMap id="BaseResultMap" type="com.stephen.blowball.model.entity.Post">
         <id property="id" column="id" jdbcType="BIGINT"/>
         <result property="title" column="title" jdbcType="VARCHAR"/>
         <result property="content" column="content" jdbcType="VARCHAR"/>
@@ -25,7 +25,7 @@
         createTime,updateTime,isDelete
     </sql>
 
-    <select id="listPostWithDelete" resultType="com.stephen.popcorn.model.entity.Post">
+    <select id="listPostWithDelete" resultType="com.stephen.blowball.model.entity.Post">
         select *
         from post
         where updateTime >= #{minUpdateTime}
