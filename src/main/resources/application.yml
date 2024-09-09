@@ -11,11 +11,11 @@ spring:
     pathmatch:
       matching-strategy: ant_path_matcher
     #   session 配置
-    session:
-      # 开启分布式 session（须先配置 Redis）
-      store-type: redis
-      # 30 天过期
-      timeout: 2592000
+  session:
+    # 开启分布式 session（须先配置 Redis）
+    store-type: redis
+    # 30 天过期
+    timeout: 2592000
   # 数据库配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -25,7 +25,7 @@ spring:
   # Redis 配置
   # todo 需替换配置，然后取消注释
   redis:
-    database: 1
+    database: 2
     host: localhost
     port: 6379
     timeout: 5000
