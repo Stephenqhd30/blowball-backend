@@ -2,6 +2,7 @@ package com.stephen.blowball.datasources;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.stephen.blowball.model.dto.post.PostQueryRequest;
+import com.stephen.blowball.model.entity.Post;
 import com.stephen.blowball.model.vo.PostVO;
 import com.stephen.blowball.service.PostService;
 import lombok.extern.slf4j.Slf4j;
@@ -28,9 +29,10 @@ public class PostDataSource implements DataSource<PostVO> {
 	public Page<PostVO> doSearch(String searchText, long pageNum, long pageSize) {
 		PostQueryRequest postQueryRequest = new PostQueryRequest();
 		postQueryRequest.setSearchText(searchText);
-		postQueryRequest.setCurrent((int)pageNum);
-		postQueryRequest.setPageSize((int)pageSize);
+		postQueryRequest.setCurrent((int) pageNum);
+		postQueryRequest.setPageSize((int) pageSize);
 		HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes())).getRequest();
-		return postService.listPostVOPage(postQueryRequest, request);
+		Page<Post> postPage = postService.searchFromEs(postQueryRequest);
+		return postService.getPostVOPage(postPage, request);
 	}
 }

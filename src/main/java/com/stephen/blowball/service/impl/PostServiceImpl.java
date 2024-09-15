@@ -93,8 +93,8 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
 	/**
 	 * 获取查询包装类
 	 *
-	 * @param postQueryRequest
-	 * @return
+	 * @param postQueryRequest postQueryRequest
+	 * @return QueryWrapper<Post>
 	 */
 	@Override
 	public QueryWrapper<Post> getQueryWrapper(PostQueryRequest postQueryRequest) {
@@ -130,6 +130,12 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
 		return queryWrapper;
 	}
 	
+	/**
+	 * 从 ES 中查询帖子
+	 *
+	 * @param postQueryRequest postQueryRequest
+	 * @return Page<Post>
+	 */
 	@Override
 	public Page<Post> searchFromEs(PostQueryRequest postQueryRequest) {
 		Long id = postQueryRequest.getId();
@@ -175,7 +181,6 @@ public class PostServiceImpl extends ServiceImpl<PostMapper, Post> implements Po
 		// 按关键词检索
 		if (StringUtils.isNotBlank(searchText)) {
 			boolQueryBuilder.should(QueryBuilders.matchQuery("title", searchText));
-			boolQueryBuilder.should(QueryBuilders.matchQuery("description", searchText));
 			boolQueryBuilder.should(QueryBuilders.matchQuery("content", searchText));
 			boolQueryBuilder.minimumShouldMatch(1);
 		}
