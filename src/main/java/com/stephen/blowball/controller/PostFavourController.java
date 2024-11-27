@@ -4,26 +4,25 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.stephen.blowball.common.BaseResponse;
 import com.stephen.blowball.common.ErrorCode;
 import com.stephen.blowball.common.ResultUtils;
-import com.stephen.blowball.exception.BusinessException;
-import com.stephen.blowball.exception.ThrowUtils;
+import com.stephen.blowball.common.ThrowUtils;
+import com.stephen.blowball.common.exception.BusinessException;
 import com.stephen.blowball.model.dto.post.PostQueryRequest;
-import com.stephen.blowball.model.dto.postfavour.PostFavourAddRequest;
-import com.stephen.blowball.model.dto.postfavour.PostFavourQueryRequest;
+import com.stephen.blowball.model.dto.postFavour.PostFavourAddRequest;
+import com.stephen.blowball.model.dto.postFavour.PostFavourQueryRequest;
 import com.stephen.blowball.model.entity.Post;
 import com.stephen.blowball.model.entity.User;
 import com.stephen.blowball.model.vo.PostVO;
 import com.stephen.blowball.service.PostFavourService;
 import com.stephen.blowball.service.PostService;
 import com.stephen.blowball.service.UserService;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * 帖子收藏接口
@@ -47,9 +46,9 @@ public class PostFavourController {
 	/**
 	 * 收藏 / 取消收藏
 	 *
-	 * @param postFavourAddRequest
-	 * @param request
-	 * @return resultNum 收藏变化数
+	 * @param postFavourAddRequest postFavourAddRequest
+	 * @param request              request
+	 * @return BaseResponse<Integer>
 	 */
 	@PostMapping("/")
 	public BaseResponse<Integer> doPostFavour(@RequestBody PostFavourAddRequest postFavourAddRequest,
@@ -67,8 +66,9 @@ public class PostFavourController {
 	/**
 	 * 获取我收藏的帖子列表
 	 *
-	 * @param postQueryRequest
-	 * @param request
+	 * @param postQueryRequest postQueryRequest
+	 * @param request          request
+	 * @return BaseResponse<Page < PostVO>>
 	 */
 	@PostMapping("/my/list/page")
 	public BaseResponse<Page<PostVO>> listMyFavourPostByPage(@RequestBody PostQueryRequest postQueryRequest,
@@ -89,8 +89,9 @@ public class PostFavourController {
 	/**
 	 * 获取用户收藏的帖子列表
 	 *
-	 * @param postFavourQueryRequest
-	 * @param request
+	 * @param postFavourQueryRequest postFavourQueryRequest
+	 * @param request                request
+	 * @return BaseResponse<Page < PostVO>>
 	 */
 	@PostMapping("/list/page")
 	public BaseResponse<Page<PostVO>> listFavourPostByPage(@RequestBody PostFavourQueryRequest postFavourQueryRequest,

@@ -1,9 +1,10 @@
 package com.stephen.blowball.model.vo;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.Date;
-
-import lombok.Data;
+import java.util.List;
 
 /**
  * 已登录用户视图（脱敏）
@@ -14,7 +15,6 @@ import lombok.Data;
 public class LoginUserVO implements Serializable {
 	
 	private static final long serialVersionUID = 2837672255648064012L;
-	
 	/**
 	 * 用户 id
 	 */
@@ -34,6 +34,11 @@ public class LoginUserVO implements Serializable {
 	 * 用户简介
 	 */
 	private String userProfile;
+	
+	/**
+	 * 性别（0-男，1-女，2-保密）
+	 */
+	private Integer userGender;
 	
 	/**
 	 * 用户角色：user/admin/ban
@@ -61,7 +66,17 @@ public class LoginUserVO implements Serializable {
 	private Date updateTime;
 	
 	/**
-	 * token
+	 * 编辑时间
+	 */
+	private Date editTime;
+	
+	/**
+	 * 用户标签(JSON字符数组)
+	 */
+	private List<String> tags;
+	
+	/**
+	 * 登录令牌
 	 */
 	private String token;
 	

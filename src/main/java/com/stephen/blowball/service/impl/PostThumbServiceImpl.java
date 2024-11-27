@@ -1,21 +1,23 @@
 package com.stephen.blowball.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.stephen.blowball.common.ErrorCode;
-import com.stephen.blowball.exception.BusinessException;
+import com.stephen.blowball.common.exception.BusinessException;
 import com.stephen.blowball.mapper.PostThumbMapper;
 import com.stephen.blowball.model.entity.Post;
 import com.stephen.blowball.model.entity.PostThumb;
 import com.stephen.blowball.model.entity.User;
 import com.stephen.blowball.service.PostService;
 import com.stephen.blowball.service.PostThumbService;
-
-import javax.annotation.Resource;
-
 import org.springframework.aop.framework.AopContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
 
 /**
  * 帖子点赞服务实现
@@ -32,9 +34,9 @@ public class PostThumbServiceImpl extends ServiceImpl<PostThumbMapper, PostThumb
 	/**
 	 * 点赞
 	 *
-	 * @param postId
-	 * @param loginUser
-	 * @return
+	 * @param postId    postId
+	 * @param loginUser loginUser
+	 * @return int
 	 */
 	@Override
 	public int doPostThumb(long postId, User loginUser) {
@@ -56,9 +58,9 @@ public class PostThumbServiceImpl extends ServiceImpl<PostThumbMapper, PostThumb
 	/**
 	 * 封装了事务的方法
 	 *
-	 * @param userId
-	 * @param postId
-	 * @return
+	 * @param userId userId
+	 * @param postId postId
+	 * @return int
 	 */
 	@Override
 	@Transactional(rollbackFor = Exception.class)
@@ -97,6 +99,22 @@ public class PostThumbServiceImpl extends ServiceImpl<PostThumbMapper, PostThumb
 				throw new BusinessException(ErrorCode.SYSTEM_ERROR);
 			}
 		}
+	}
+	
+	/**
+	 * 分页获取用户点赞的帖子列表
+	 *
+	 * @param page         page
+	 * @param queryWrapper queryWrapper
+	 * @param thumbUserId thumbUserId
+	 * @return {@link Page <Post>}
+	 */
+	@Override
+	public Page<Post> listThumbPostByPage(IPage<Post> page, Wrapper<Post> queryWrapper, long thumbUserId) {
+		if (thumbUserId <= 0) {
+			return new Page<>();
+		}
+		return baseMapper.listThumbPostByPage(page, queryWrapper, thumbUserId);
 	}
 	
 }

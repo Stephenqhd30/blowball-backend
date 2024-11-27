@@ -1,15 +1,11 @@
 package com.stephen.blowball.controller;
 
+import cn.dev33.satoken.annotation.SaCheckRole;
 import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.stephen.blowball.annotation.AuthCheck;
-import com.stephen.blowball.common.BaseResponse;
-import com.stephen.blowball.common.DeleteRequest;
-import com.stephen.blowball.common.ErrorCode;
-import com.stephen.blowball.common.ResultUtils;
+import com.stephen.blowball.common.*;
+import com.stephen.blowball.common.exception.BusinessException;
 import com.stephen.blowball.constants.UserConstant;
-import com.stephen.blowball.exception.BusinessException;
-import com.stephen.blowball.exception.ThrowUtils;
 import com.stephen.blowball.model.dto.post.PostAddRequest;
 import com.stephen.blowball.model.dto.post.PostEditRequest;
 import com.stephen.blowball.model.dto.post.PostQueryRequest;
@@ -19,18 +15,13 @@ import com.stephen.blowball.model.entity.User;
 import com.stephen.blowball.model.vo.PostVO;
 import com.stephen.blowball.service.PostService;
 import com.stephen.blowball.service.UserService;
-
-import java.util.List;
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 /**
  * 帖子接口
@@ -53,9 +44,9 @@ public class PostController {
 	/**
 	 * 创建
 	 *
-	 * @param postAddRequest
-	 * @param request
-	 * @return
+	 * @param postAddRequest postAddRequest
+	 * @param request        request
+	 * @return BaseResponse<Long>
 	 */
 	@PostMapping("/add")
 	public BaseResponse<Long> addPost(@RequestBody PostAddRequest postAddRequest, HttpServletRequest request) {
@@ -82,9 +73,9 @@ public class PostController {
 	/**
 	 * 删除
 	 *
-	 * @param deleteRequest
-	 * @param request
-	 * @return
+	 * @param deleteRequest deleteRequest
+	 * @param request       request
+	 * @return BaseResponse<Boolean>
 	 */
 	@PostMapping("/delete")
 	public BaseResponse<Boolean> deletePost(@RequestBody DeleteRequest deleteRequest, HttpServletRequest request) {
@@ -97,7 +88,7 @@ public class PostController {
 		Post oldPost = postService.getById(id);
 		ThrowUtils.throwIf(oldPost == null, ErrorCode.NOT_FOUND_ERROR);
 		// 仅本人或管理员可删除
-		if (!oldPost.getUserId().equals(user.getId()) && !userService.isAdmin(request)) {
+		if (!oldPost.getUserId().equals(user.getId()) && userService.isAdmin(request)) {
 			throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
 		}
 		boolean b = postService.removeById(id);
@@ -107,15 +98,13 @@ public class PostController {
 	/**
 	 * 更新（仅管理员）
 	 *
-	 * @param postUpdateRequest
-	 * @return
+	 * @param postUpdateRequest postUpdateRequest
+	 * @return BaseResponse<Boolean>
 	 */
 	@PostMapping("/update")
-	@AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+	@SaCheckRole(UserConstant.ADMIN_ROLE)
 	public BaseResponse<Boolean> updatePost(@RequestBody PostUpdateRequest postUpdateRequest) {
-		if (postUpdateRequest == null || postUpdateRequest.getId() <= 0) {
-			throw new BusinessException(ErrorCode.PARAMS_ERROR);
-		}
+		ThrowUtils.throwIf(postUpdateRequest == null || postUpdateRequest.getId() <= 0, ErrorCode.PARAMS_ERROR);
 		Post post = new Post();
 		BeanUtils.copyProperties(postUpdateRequest, post);
 		List<String> tags = postUpdateRequest.getTags();
@@ -135,8 +124,8 @@ public class PostController {
 	/**
 	 * 根据 id 获取
 	 *
-	 * @param id
-	 * @return
+	 * @param id id
+	 * @return BaseResponse<PostVO>
 	 */
 	@GetMapping("/get/vo")
 	public BaseResponse<PostVO> getPostVOById(long id, HttpServletRequest request) {
@@ -153,11 +142,11 @@ public class PostController {
 	/**
 	 * 分页获取列表（仅管理员）
 	 *
-	 * @param postQueryRequest
-	 * @return
+	 * @param postQueryRequest postQueryRequest
+	 * @return BaseResponse<Page < Post>>
 	 */
 	@PostMapping("/list/page")
-	@AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+	@SaCheckRole(UserConstant.ADMIN_ROLE)
 	public BaseResponse<Page<Post>> listPostByPage(@RequestBody PostQueryRequest postQueryRequest) {
 		long current = postQueryRequest.getCurrent();
 		long size = postQueryRequest.getPageSize();
@@ -169,9 +158,9 @@ public class PostController {
 	/**
 	 * 分页获取列表（封装类）
 	 *
-	 * @param postQueryRequest
-	 * @param request
-	 * @return
+	 * @param postQueryRequest postQueryRequest
+	 * @param request          request
+	 * @return BaseResponse<Page < PostVO>>
 	 */
 	@PostMapping("/list/page/vo")
 	public BaseResponse<Page<PostVO>> listPostVOByPage(@RequestBody PostQueryRequest postQueryRequest,
@@ -180,23 +169,22 @@ public class PostController {
 		long size = postQueryRequest.getPageSize();
 		// 限制爬虫
 		ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
-		Page<PostVO> postVOPage = postService.listPostVOPage(postQueryRequest, request);
-		return ResultUtils.success(postVOPage);
+		Page<Post> postPage = postService.page(new Page<>(current, size),
+				postService.getQueryWrapper(postQueryRequest));
+		return ResultUtils.success(postService.getPostVOPage(postPage, request));
 	}
 	
 	/**
 	 * 分页获取当前用户创建的资源列表
 	 *
-	 * @param postQueryRequest
-	 * @param request
+	 * @param postQueryRequest postQueryRequest
+	 * @param request          request
 	 * @return
 	 */
 	@PostMapping("/my/list/page/vo")
 	public BaseResponse<Page<PostVO>> listMyPostVOByPage(@RequestBody PostQueryRequest postQueryRequest,
 	                                                     HttpServletRequest request) {
-		if (postQueryRequest == null) {
-			throw new BusinessException(ErrorCode.PARAMS_ERROR);
-		}
+		ThrowUtils.throwIf(postQueryRequest == null, ErrorCode.PARAMS_ERROR);
 		User loginUser = userService.getLoginUser(request);
 		postQueryRequest.setUserId(loginUser.getId());
 		long current = postQueryRequest.getCurrent();
@@ -211,28 +199,11 @@ public class PostController {
 	// endregion
 	
 	/**
-	 * 分页搜索（从 ES 查询，封装类）
-	 *
-	 * @param postQueryRequest
-	 * @param request
-	 * @return
-	 */
-	@PostMapping("/search/page/vo")
-	public BaseResponse<Page<PostVO>> searchPostVOByPage(@RequestBody PostQueryRequest postQueryRequest,
-	                                                     HttpServletRequest request) {
-		long size = postQueryRequest.getPageSize();
-		// 限制爬虫
-		ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
-		Page<Post> postPage = postService.searchFromEs(postQueryRequest);
-		return ResultUtils.success(postService.getPostVOPage(postPage, request));
-	}
-	
-	/**
 	 * 编辑（用户）
 	 *
-	 * @param postEditRequest
-	 * @param request
-	 * @return
+	 * @param postEditRequest postEditRequest
+	 * @param request         request
+	 * @return BaseResponse<Boolean>
 	 */
 	@PostMapping("/edit")
 	public BaseResponse<Boolean> editPost(@RequestBody PostEditRequest postEditRequest, HttpServletRequest request) {
@@ -253,11 +224,10 @@ public class PostController {
 		Post oldPost = postService.getById(id);
 		ThrowUtils.throwIf(oldPost == null, ErrorCode.NOT_FOUND_ERROR);
 		// 仅本人或管理员可编辑
-		if (!oldPost.getUserId().equals(loginUser.getId()) && !userService.isAdmin(loginUser)) {
+		if (!oldPost.getUserId().equals(loginUser.getId()) && userService.isAdmin(loginUser)) {
 			throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
 		}
 		boolean result = postService.updateById(post);
 		return ResultUtils.success(result);
 	}
-	
 }

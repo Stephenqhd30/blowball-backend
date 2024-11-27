@@ -1,18 +1,17 @@
 package com.stephen.blowball.job.cycle;
 
-import com.stephen.blowball.esdao.PostEsDao;
+import cn.hutool.core.collection.CollUtil;
+import com.stephen.blowball.elasticsearch.mapper.PostEsDao;
+import com.stephen.blowball.elasticsearch.modal.entity.PostEsDTO;
 import com.stephen.blowball.mapper.PostMapper;
-import com.stephen.blowball.model.dto.post.PostEsDTO;
 import com.stephen.blowball.model.entity.Post;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 
+import javax.annotation.Resource;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.annotation.Resource;
-
-import lombok.extern.slf4j.Slf4j;
-import cn.hutool.core.collection.CollUtil;
-import org.springframework.scheduling.annotation.Scheduled;
 
 /**
  * 增量同步帖子到 es

@@ -1,8 +1,9 @@
 package com.stephen.blowball.model.dto.user;
 
-import java.io.Serializable;
-
 import lombok.Data;
+
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * 用户创建请求
@@ -29,6 +30,11 @@ public class UserAddRequest implements Serializable {
 	private String userAvatar;
 	
 	/**
+	 * 性别（0-男，1-女，2-保密）
+	 */
+	private Integer userGender;
+	
+	/**
 	 * 用户角色: user, admin
 	 */
 	private String userRole;
@@ -47,5 +53,11 @@ public class UserAddRequest implements Serializable {
 	 * 手机号码
 	 */
 	private String userPhone;
+	
+	/**
+	 * 标签列表(使用JSON字符数组)
+	 */
+	private List<String> tags;
+	
 	
 }

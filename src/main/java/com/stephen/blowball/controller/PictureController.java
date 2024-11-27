@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.stephen.blowball.common.BaseResponse;
 import com.stephen.blowball.common.ErrorCode;
 import com.stephen.blowball.common.ResultUtils;
-import com.stephen.blowball.exception.ThrowUtils;
+import com.stephen.blowball.common.ThrowUtils;
 import com.stephen.blowball.model.dto.picture.PictureQueryRequest;
 import com.stephen.blowball.model.entity.Picture;
 import com.stephen.blowball.service.PictureService;

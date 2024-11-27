@@ -1,17 +1,16 @@
 package com.stephen.blowball.job.once;
 
-import com.stephen.blowball.esdao.PostEsDao;
-import com.stephen.blowball.model.dto.post.PostEsDTO;
+import cn.hutool.core.collection.CollUtil;
+import com.stephen.blowball.elasticsearch.mapper.PostEsDao;
+import com.stephen.blowball.elasticsearch.modal.entity.PostEsDTO;
 import com.stephen.blowball.model.entity.Post;
 import com.stephen.blowball.service.PostService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.CommandLineRunner;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.stream.Collectors;
-import javax.annotation.Resource;
-
-import lombok.extern.slf4j.Slf4j;
-import cn.hutool.core.collection.CollUtil;
-import org.springframework.boot.CommandLineRunner;
 
 /**
  * 全量同步帖子到 es
@@ -19,7 +18,7 @@ import org.springframework.boot.CommandLineRunner;
  * @author stephen qiu
  */
 // todo 取消注释开启任务
-//@Component
+// @Component
 @Slf4j
 public class FullSyncPostToEs implements CommandLineRunner {
 	

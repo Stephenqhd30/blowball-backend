@@ -1,6 +1,7 @@
 package com.stephen.blowball.service;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.stephen.blowball.elasticsearch.service.PostEsService;
 import com.stephen.blowball.model.dto.post.PostQueryRequest;
 import com.stephen.blowball.model.entity.Post;
 import javax.annotation.Resource;
@@ -18,13 +19,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 class PostServiceTest {
 
     @Resource
-    private PostService postService;
+    private PostEsService postEsService;
 
     @Test
     void searchFromEs() {
         PostQueryRequest postQueryRequest = new PostQueryRequest();
         postQueryRequest.setUserId(1L);
-        Page<Post> postPage = postService.searchFromEs(postQueryRequest);
+        Page<Post> postPage = postEsService.searchPostFromEs(postQueryRequest);
         Assertions.assertNotNull(postPage);
     }
 

@@ -1,14 +1,15 @@
 package com.stephen.blowball.model.vo;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.json.JSONUtil;
 import com.stephen.blowball.model.entity.Post;
+import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.BeanUtils;
 
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-
-import lombok.Data;
-import org.springframework.beans.BeanUtils;
 
 /**
  * 帖子视图
@@ -18,6 +19,7 @@ import org.springframework.beans.BeanUtils;
 @Data
 public class PostVO implements Serializable {
 	
+	private static final long serialVersionUID = -8987057543789654391L;
 	/**
 	 * id
 	 */
@@ -32,6 +34,12 @@ public class PostVO implements Serializable {
 	 * 内容
 	 */
 	private String content;
+	
+	
+	/**
+	 * 封面
+	 */
+	private String cover;
 	
 	/**
 	 * 点赞数
@@ -61,12 +69,12 @@ public class PostVO implements Serializable {
 	/**
 	 * 标签列表
 	 */
-	private List<String> tagList;
+	private List<String> tags;
 	
 	/**
 	 * 创建人信息
 	 */
-	private UserVO user;
+	private UserVO userVO;
 	
 	/**
 	 * 是否已点赞
@@ -81,8 +89,8 @@ public class PostVO implements Serializable {
 	/**
 	 * 包装类转对象
 	 *
-	 * @param postVO
-	 * @return
+	 * @param postVO postVO
+	 * @return {@link Post}
 	 */
 	public static Post voToObj(PostVO postVO) {
 		if (postVO == null) {
@@ -90,16 +98,18 @@ public class PostVO implements Serializable {
 		}
 		Post post = new Post();
 		BeanUtils.copyProperties(postVO, post);
-		List<String> tagList = postVO.getTagList();
-		post.setTags(JSONUtil.toJsonStr(tagList));
+		List<String> tagList = postVO.getTags();
+		if (CollUtil.isNotEmpty(tagList)) {
+			post.setTags(JSONUtil.toJsonStr(tagList));
+		}
 		return post;
 	}
 	
 	/**
 	 * 对象转包装类
 	 *
-	 * @param post
-	 * @return
+	 * @param post post
+	 * @return {@link PostVO}
 	 */
 	public static PostVO objToVo(Post post) {
 		if (post == null) {
@@ -107,7 +117,9 @@ public class PostVO implements Serializable {
 		}
 		PostVO postVO = new PostVO();
 		BeanUtils.copyProperties(post, postVO);
-		postVO.setTagList(JSONUtil.toList(post.getTags(), String.class));
+		if (StringUtils.isNotBlank(post.getTags())) {
+			postVO.setTags(JSONUtil.toList(post.getTags(), String.class));
+		}
 		return postVO;
 	}
 }

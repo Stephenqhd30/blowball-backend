@@ -1,22 +1,28 @@
 package com.stephen.blowball.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.stephen.blowball.common.BaseResponse;
 import com.stephen.blowball.common.ErrorCode;
 import com.stephen.blowball.common.ResultUtils;
-import com.stephen.blowball.exception.BusinessException;
-import com.stephen.blowball.model.dto.postthumb.PostThumbAddRequest;
+import com.stephen.blowball.common.ThrowUtils;
+import com.stephen.blowball.common.exception.BusinessException;
+import com.stephen.blowball.model.dto.post.PostQueryRequest;
+import com.stephen.blowball.model.dto.postThumb.PostThumbAddRequest;
+import com.stephen.blowball.model.dto.postThumb.PostThumbQueryRequest;
+import com.stephen.blowball.model.entity.Post;
 import com.stephen.blowball.model.entity.User;
+import com.stephen.blowball.model.vo.PostVO;
+import com.stephen.blowball.service.PostService;
 import com.stephen.blowball.service.PostThumbService;
 import com.stephen.blowball.service.UserService;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * 帖子点赞接口
@@ -34,12 +40,15 @@ public class PostThumbController {
 	@Resource
 	private UserService userService;
 	
+	@Resource
+	private PostService postService;
+	
 	/**
 	 * 点赞 / 取消点赞
 	 *
-	 * @param postThumbAddRequest
-	 * @param request
-	 * @return resultNum 本次点赞变化数
+	 * @param postThumbAddRequest postThumbAddRequest
+	 * @param request             request
+	 * @return BaseResponse<Integer> resultNum 本次点赞变化数
 	 */
 	@PostMapping("/")
 	public BaseResponse<Integer> doThumb(@RequestBody PostThumbAddRequest postThumbAddRequest,
@@ -52,6 +61,52 @@ public class PostThumbController {
 		long postId = postThumbAddRequest.getPostId();
 		int result = postThumbService.doPostThumb(postId, loginUser);
 		return ResultUtils.success(result);
+	}
+	
+	/**
+	 * 获取我点赞的帖子列表
+	 *
+	 * @param postQueryRequest postQueryRequest
+	 * @param request          request
+	 * @return BaseResponse<Page < PostVO>>
+	 */
+	@PostMapping("/my/list/page")
+	public BaseResponse<Page<PostVO>> listMyThumbPostByPage(@RequestBody PostQueryRequest postQueryRequest,
+	                                                        HttpServletRequest request) {
+		if (postQueryRequest == null) {
+			throw new BusinessException(ErrorCode.PARAMS_ERROR);
+		}
+		User loginUser = userService.getLoginUser(request);
+		long current = postQueryRequest.getCurrent();
+		long size = postQueryRequest.getPageSize();
+		// 限制爬虫
+		ThrowUtils.throwIf(size > 20, ErrorCode.PARAMS_ERROR);
+		Page<Post> postPage = postThumbService.listThumbPostByPage(new Page<>(current, size),
+				postService.getQueryWrapper(postQueryRequest), loginUser.getId());
+		return ResultUtils.success(postService.getPostVOPage(postPage, request));
+	}
+	
+	/**
+	 * 获取用户点赞的帖子列表
+	 *
+	 * @param postThumbQueryRequest postThumbQueryRequest
+	 * @param request               request
+	 * @return BaseResponse<Page < PostVO>>
+	 */
+	@PostMapping("/list/page")
+	public BaseResponse<Page<PostVO>> listThumbPostByPage(@RequestBody PostThumbQueryRequest postThumbQueryRequest,
+	                                                      HttpServletRequest request) {
+		if (postThumbQueryRequest == null) {
+			throw new BusinessException(ErrorCode.PARAMS_ERROR);
+		}
+		long current = postThumbQueryRequest.getCurrent();
+		long size = postThumbQueryRequest.getPageSize();
+		Long userId = postThumbQueryRequest.getUserId();
+		// 限制爬虫
+		ThrowUtils.throwIf(size > 20 || userId == null, ErrorCode.PARAMS_ERROR);
+		Page<Post> postPage = postThumbService.listThumbPostByPage(new Page<>(current, size),
+				postService.getQueryWrapper(postThumbQueryRequest.getPostQueryRequest()), userId);
+		return ResultUtils.success(postService.getPostVOPage(postPage, request));
 	}
 	
 }

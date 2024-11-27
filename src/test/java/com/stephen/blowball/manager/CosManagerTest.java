@@ -1,6 +1,8 @@
 package com.stephen.blowball.manager;
 
 import javax.annotation.Resource;
+
+import com.stephen.blowball.manager.oss.CosManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 

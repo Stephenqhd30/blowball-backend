@@ -1,11 +1,11 @@
 package com.stephen.blowball.model.dto.user;
 
 import com.stephen.blowball.common.PageRequest;
-
-import java.io.Serializable;
-
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.io.Serializable;
+import java.util.List;
 
 /**
  * 用户查询请求
@@ -22,9 +22,29 @@ public class UserQueryRequest extends PageRequest implements Serializable {
 	private Long id;
 	
 	/**
+	 * id
+	 */
+	private Long notId;
+	
+	/**
+	 * 开放平台id
+	 */
+	private String unionId;
+	
+	/**
+	 * 公众号openId
+	 */
+	private String mpOpenId;
+	
+	/**
 	 * 用户昵称
 	 */
 	private String userName;
+	
+	/**
+	 * 性别（0-男，1-女，2-保密）
+	 */
+	private Integer userGender;
 	
 	/**
 	 * 简介
@@ -36,7 +56,6 @@ public class UserQueryRequest extends PageRequest implements Serializable {
 	 */
 	private String userRole;
 	
-	
 	/**
 	 * 用户邮箱
 	 */
@@ -46,5 +65,20 @@ public class UserQueryRequest extends PageRequest implements Serializable {
 	 * 手机号码
 	 */
 	private String userPhone;
+	
+	/**
+	 * 标签列表(使用JSON字符数组)
+	 */
+	private List<String> tags;
+	
+	/**
+	 * 至少有一个标签
+	 */
+	private List<String> orTags;
+	
+	/**
+	 * 搜索关键词
+	 */
+	private String searchText;
 	
 }

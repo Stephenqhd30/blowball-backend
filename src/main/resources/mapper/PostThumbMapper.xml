@@ -2,20 +2,28 @@
 <!-- @author stephen qiu -->
 <!--  -->
 <!DOCTYPE mapper
-        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.stephen.popcorn.mapper.PostThumbMapper">
+		PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+		"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.stephen.blowball.mapper.PostThumbMapper">
 
-    <resultMap id="BaseResultMap" type="com.stephen.blowball.model.entity.PostThumb">
-            <id property="id" column="id" jdbcType="BIGINT"/>
-            <result property="postId" column="postId" jdbcType="BIGINT"/>
-            <result property="userId" column="userId" jdbcType="BIGINT"/>
-            <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
-            <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
-    </resultMap>
+	<resultMap id="BaseResultMap" type="com.stephen.blowball.model.entity.PostThumb">
+		<id property="id" column="id" jdbcType="BIGINT"/>
+		<result property="postId" column="postId" jdbcType="BIGINT"/>
+		<result property="userId" column="userId" jdbcType="BIGINT"/>
+		<result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
+		<result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
+	</resultMap>
 
-    <sql id="Base_Column_List">
-        id,postId,
+	<sql id="Base_Column_List">
+		id
+		,postId,
         userId,createTime,updateTime
-    </sql>
+	</sql>
+	<!-- 分页获取已点赞帖子列表 -->
+	<select id="listThumbPostByPage" resultType="com.stephen.blowball.model.entity.Post">
+		select p.*
+		from post p
+			     join (select postId from post_thumb where userId = #{thumbUserId}) pt
+			          on p.id = pt.postId ${ew.customSqlSegment}
+	</select>
 </mapper>

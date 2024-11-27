@@ -1,9 +1,9 @@
 package com.stephen.blowball.model.dto.post;
 
+import lombok.Data;
+
 import java.io.Serializable;
 import java.util.List;
-
-import lombok.Data;
 
 /**
  * 创建请求
@@ -22,6 +22,12 @@ public class PostAddRequest implements Serializable {
 	 * 内容
 	 */
 	private String content;
+	
+	
+	/**
+	 * 封面
+	 */
+	private String cover;
 	
 	/**
 	 * 标签列表
